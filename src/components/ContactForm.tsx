@@ -1,18 +1,21 @@
-"use client";
-import React, { ChangeEvent, FormEvent, useState } from "react";
-import Banner, { BannerData } from "./Banner";
+'use client';
+import React, { ChangeEvent, FormEvent, useState } from 'react';
+import Banner, { BannerData } from './Banner';
+import { sendContactEmail } from '@/service/contact';
 
 type Form = {
     from: string;
     subject: string;
     message: string;
 };
+
+const DEFAULT_VALUE = {
+    from: '',
+    subject: '',
+    message: '',
+};
 export default function ContactForm() {
-    const [form, setForm] = useState<Form>({
-        from: "",
-        subject: "",
-        message: "",
-    });
+    const [form, setForm] = useState<Form>(DEFAULT_VALUE);
     const [banner, setBanner] = useState<BannerData | null>(null);
     const handleChange = (
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -22,53 +25,68 @@ export default function ContactForm() {
     };
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setBanner({ message: "성공했어!!", state: "success" });
-        setTimeout(() => {
-            setBanner(null);
-        }, 3000);
+        sendContactEmail(form)
+            .then(() => {
+                setBanner({
+                    message: '메시지 전송에 성공했습니다.',
+                    state: 'success',
+                });
+                setForm(DEFAULT_VALUE);
+            })
+            .catch(() => {
+                setBanner({
+                    message: '메시지 전송에 실패했습니다.',
+                    state: 'error',
+                });
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    setBanner(null);
+                }, 3000);
+            });
     };
     return (
-        <section className="w-full max-w-md">
+        <section className='w-full max-w-md'>
             {banner && <Banner banner={banner} />}
             <form
                 onSubmit={handleSubmit}
-                className="w-full  flex flex-col gap-2 my-4 p-4 bg-slate-700 rounded-xl text-white"
+                className='w-full  flex flex-col gap-2 my-4 p-4 bg-slate-700 rounded-xl text-white'
             >
-                <label htmlFor="from" className="font-semibold">
-                    Ypur Email
+                <label htmlFor='from' className='font-semibold'>
+                    Your Email
                 </label>
                 <input
-                    type="email"
-                    id="from"
-                    name="from"
+                    type='email'
+                    id='from'
+                    name='from'
                     onChange={handleChange}
                     required
                     value={form.from}
-                    className="text-black outline-none"
+                    className='text-black outline-none'
                 />
-                <label htmlFor="subject" className="font-semibold">
+                <label htmlFor='subject' className='font-semibold'>
                     제목
                 </label>
                 <textarea
                     rows={10}
-                    id="subject"
-                    name="subject"
+                    id='subject'
+                    name='subject'
                     onChange={handleChange}
                     value={form.subject}
-                    className="text-black outline-none"
+                    className='text-black outline-none'
                 />
-                <label htmlFor="message" className="font-semibold">
+                <label htmlFor='message' className='font-semibold'>
                     Message
                 </label>
                 <input
-                    type="text"
-                    id="message"
-                    name="message"
+                    type='text'
+                    id='message'
+                    name='message'
                     onChange={handleChange}
                     value={form.message}
-                    className="text-black outline-none"
+                    className='text-black outline-none'
                 />
-                <button className="bg-yellow-300 text-black font-bold hover:bg-yellow-400">
+                <button className='bg-yellow-300 text-black font-bold hover:bg-yellow-400'>
                     Submit
                 </button>
             </form>
