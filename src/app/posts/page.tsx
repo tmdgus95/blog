@@ -1,8 +1,9 @@
 import FilterablePosts from '@/components/FilterablePosts';
 import { getAllPosts } from '@/service/posts';
+import { Metadata } from 'next';
 import React from 'react';
 
-export const metadata = {
+export const metadata: Metadata = {
     title: 'All Posts',
     description: '개발 관련 블로그 글',
 };
